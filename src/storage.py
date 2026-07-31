@@ -6,6 +6,12 @@ from datetime import date
 expenses: List[Expense] = []
 _next_id = 1
 
+def clear_expenses() -> None:
+    global _next_id
+
+    expenses.clear()
+    _next_id = 1
+
 
 def get_all_expenses() -> List[Expense]:
     return expenses
