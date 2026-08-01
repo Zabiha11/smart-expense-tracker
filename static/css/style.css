@@ -645,32 +645,134 @@ body {
 
 
 /* ---------- Expenses Table ---------- */
+/* ---------- Expenses Table ---------- */
 
 .expenses-panel {
     margin-bottom: 30px;
 }
 
 
-.filter-wrapper select {
+/* ---------- Transaction Controls ---------- */
+
+.filter-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+/* Search */
+
+#expenseSearch {
+    height: 42px;
+    width: 220px;
+
+    padding: 0 14px;
+
     border: 1px solid var(--border);
+    border-radius: 10px;
 
     background: var(--surface-soft);
+    color: var(--ink);
+
+    font-family: inherit;
+    font-size: 12px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+
+#expenseSearch::placeholder {
+    color: #999b95;
+}
+
+
+#expenseSearch:hover {
+    border-color: #c8c8c1;
+}
+
+
+#expenseSearch:focus {
+    border-color: var(--accent);
+
+    background: var(--surface);
+
+    box-shadow:
+        0 0 0 3px var(--accent-soft);
+}
+
+
+/* Category dropdown */
+
+#categoryFilter {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    width: 175px;
+    height: 42px;
+
+    padding: 0 40px 0 14px;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    background-color: var(--surface-soft);
 
     color: var(--ink);
 
-    padding: 9px 12px;
-
-    border-radius: 8px;
-
     font-family: inherit;
-
-    font-size: 11px;
+    font-size: 12px;
+    font-weight: 500;
 
     cursor: pointer;
-
     outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23526757' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+
+    background-repeat: no-repeat;
+    background-position: right 13px center;
+    background-size: 14px;
 }
 
+
+#categoryFilter:hover {
+    border-color: #c8c8c1;
+
+    background-color: var(--surface);
+}
+
+
+#categoryFilter:focus {
+    border-color: var(--accent);
+
+    background-color: var(--surface);
+
+    box-shadow:
+        0 0 0 3px var(--accent-soft);
+}
+
+
+#categoryFilter option {
+    background: #ffffff;
+    color: var(--ink);
+
+    font-family: inherit;
+    font-size: 12px;
+}
+
+
+/* ---------- Table ---------- */
 
 .table-wrapper {
     overflow-x: auto;
@@ -692,7 +794,7 @@ thead {
 
 
 th {
-    padding: 12px 24px;
+    padding: 13px 24px;
 
     text-align: left;
 
@@ -700,18 +802,55 @@ th {
 
     font-size: 9px;
 
+    font-weight: 700;
+
     text-transform: uppercase;
 
     letter-spacing: 1px;
+
+    white-space: nowrap;
 }
 
 
 td {
-    padding: 16px 24px;
+    padding: 17px 24px;
 
     border-top: 1px solid #efeee9;
 
     font-size: 12px;
+
+    vertical-align: middle;
+}
+
+
+/* Row hover */
+
+tbody tr {
+    transition:
+        background-color 0.15s ease;
+}
+
+
+tbody tr:hover {
+    background: #fbfaf7;
+}
+
+
+/* Expense title */
+
+td strong {
+    font-weight: 600;
+}
+
+
+/* Amount */
+
+.amount-cell {
+    font-weight: 700;
+
+    font-variant-numeric: tabular-nums;
+
+    white-space: nowrap;
 }
 
 
@@ -721,8 +860,12 @@ th:last-child {
 }
 
 
+/* ---------- Category Badge ---------- */
+
 .category-badge {
-    display: inline-block;
+    display: inline-flex;
+
+    align-items: center;
 
     background: var(--accent-soft);
 
@@ -735,16 +878,23 @@ th:last-child {
     font-size: 10px;
 
     font-weight: 600;
+
+    white-space: nowrap;
 }
 
 
-.amount-cell {
-    font-weight: 700;
-}
-
+/* ---------- Delete Button ---------- */
 
 .delete-btn {
-    border: none;
+    width: 32px;
+    height: 32px;
+
+    display: inline-grid;
+    place-items: center;
+
+    border: 1px solid transparent;
+
+    border-radius: 8px;
 
     background: transparent;
 
@@ -752,19 +902,37 @@ th:last-child {
 
     cursor: pointer;
 
-    font-size: 15px;
+    font-size: 17px;
+    line-height: 1;
 
-    transition: 0.2s ease;
+    transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease;
 }
 
 
 .delete-btn:hover {
     color: var(--danger);
+
+    background: #f9eeee;
+
+    border-color: #f0dada;
+
+    transform: translateY(-1px);
 }
 
 
+.delete-btn:active {
+    transform: translateY(0);
+}
+
+
+/* ---------- Empty State ---------- */
+
 .table-empty {
-    padding: 35px;
+    padding: 45px 25px;
 
     text-align: center;
 
@@ -776,33 +944,17 @@ th:last-child {
 }
 
 
-/* ---------- Empty ---------- */
+.table-empty::before {
+    content: "◌";
 
-.empty-state {
-    min-height: 200px;
+    display: block;
 
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-    justify-content: center;
-
-    color: var(--muted);
-
-    font-size: 12px;
-
-    gap: 8px;
-}
-
-
-.empty-icon {
-    font-size: 26px;
+    margin-bottom: 8px;
 
     color: #b7b8b2;
+
+    font-size: 26px;
 }
-
-
 /* ---------- Modal ---------- */
 
 .modal-overlay {
@@ -1316,111 +1468,4 @@ th:last-child {
         width: 100%;
     }
 
-}
-
-/* --------------------------------------------------
-   Category Filter
--------------------------------------------------- */
-
-#categoryFilter {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-
-    min-width: 170px;
-    height: 42px;
-
-    padding: 0 42px 0 14px;
-
-    border: 1px solid #deddd7;
-    border-radius: 10px;
-
-    background-color: #ffffff;
-
-    color: #252824;
-
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 500;
-
-    cursor: pointer;
-
-    outline: none;
-
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease,
-        background-color 0.2s ease;
-
-    /* Custom dropdown arrow */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23526757' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    background-size: 14px;
-}
-
-
-/* Hover */
-
-#categoryFilter:hover {
-    border-color: #aeb8a9;
-    background-color: #fcfcfa;
-}
-
-
-/* Focus */
-
-#categoryFilter:focus {
-    border-color: #526b57;
-
-    box-shadow:
-        0 0 0 3px rgba(82, 107, 87, 0.12);
-}
-
-
-/* Selected option */
-
-#categoryFilter option {
-    color: #252824;
-    background: #ffffff;
-    font-size: 14px;
-}
-
-#expenseSearch {
-    height: 42px;
-    min-width: 220px;
-
-    padding: 0 14px;
-
-    border: 1px solid #deddd7;
-    border-radius: 10px;
-
-    background: #ffffff;
-
-    color: #252824;
-
-    font-family: inherit;
-    font-size: 14px;
-
-    outline: none;
-
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-#expenseSearch::placeholder {
-    color: #969991;
-}
-
-#expenseSearch:hover {
-    border-color: #aeb8a9;
-}
-
-#expenseSearch:focus {
-    border-color: #526b57;
-
-    box-shadow:
-        0 0 0 3px rgba(82, 107, 87, 0.12);
 }
