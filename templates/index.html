@@ -157,8 +157,18 @@
                     <div>
                         <p class="panel-eyebrow">BREAKDOWN</p>
                         <h2>Spending by category</h2>
+                        
                     </div>
 
+                </div>
+
+                <div class="chart-container">
+                    <div class="donut-chart" id="categoryChart">
+                        <div class="chart-center">
+                            <span id="chartTotal">₹0</span>
+                            <small>Total</small>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="categoryList" class="category-list">
@@ -213,7 +223,15 @@
                     <h2>All expenses</h2>
                 </div>
 
-                <div class="filter-wrapper">
+                <div class="filter-controls">
+
+                    <input
+                        type="search"
+                        id="expenseSearch"
+                        class="search-input"
+                        placeholder="Search expenses..."
+                        aria-label="Search expenses"
+                    >
 
                     <select id="categoryFilter">
                         <option value="">All categories</option>

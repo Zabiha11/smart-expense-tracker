@@ -30,6 +30,8 @@ const formError = document.getElementById("formError");
 const toast = document.getElementById("toast");
 const toastMessage = document.getElementById("toastMessage");
 
+const expenseSearch = document.getElementById("expenseSearch");
+
 
 // --------------------------------------------------
 // Utilities
@@ -197,11 +199,18 @@ function renderCategories(categories) {
 
     categoryList.innerHTML = "";
 
-
     const entries = Object.entries(categories);
+
+    const chart = document.getElementById("categoryChart");
+    const chartTotal = document.getElementById("chartTotal");
 
 
     if (entries.length === 0) {
+
+        chart.style.background =
+            "conic-gradient(#e8e6df 0deg, #e8e6df 360deg)";
+
+        chartTotal.textContent = "₹0";
 
         categoryList.innerHTML = `
             <div class="empty-state">
@@ -214,50 +223,110 @@ function renderCategories(categories) {
     }
 
 
+    const total = entries.reduce(
+        (sum, [_, amount]) => sum + amount,
+        0
+    );
+
+
+    chartTotal.textContent = formatCurrency(total);
+
+
+    const chartColors = [
+        "#526b57",
+        "#7c8f70",
+        "#a7b39b",
+        "#c4cdbb",
+        "#d6dccf",
+        "#8b7355",
+        "#6c7a89",
+        "#9b8b7a"
+    ];
+
+
+    let currentDegree = 0;
+
+    const gradientParts = [];
+
+
+    entries
+        .sort((a, b) => b[1] - a[1])
+        .forEach(([category, amount], index) => {
+
+            const percentage =
+                (amount / total) * 100;
+
+            const degree =
+                percentage * 3.6;
+
+            const start = currentDegree;
+
+            const end =
+                currentDegree + degree;
+
+
+            gradientParts.push(
+                `${chartColors[index % chartColors.length]} ${start}deg ${end}deg`
+            );
+
+
+            currentDegree = end;
+
+        });
+
+
+    chart.style.background =
+        `conic-gradient(${gradientParts.join(", ")})`;
+
+
     const maxAmount = Math.max(
         ...entries.map(([_, amount]) => amount)
     );
 
 
-    entries
-        .sort((a, b) => b[1] - a[1])
-        .forEach(([category, amount]) => {
+    entries.forEach(([category, amount], index) => {
 
-            const percentage =
-                maxAmount > 0
-                    ? (amount / maxAmount) * 100
-                    : 0;
+        const percentage =
+            maxAmount > 0
+                ? (amount / maxAmount) * 100
+                : 0;
 
 
-            const row = document.createElement("div");
-
-            row.className = "category-row";
-
-
-            row.innerHTML = `
-                <div class="category-name">
-                    ${escapeHtml(category)}
-                </div>
-
-                <div class="category-bar">
-                    <div
-                        class="category-bar-fill"
-                        style="width: ${percentage}%"
-                    ></div>
-                </div>
-
-                <div class="category-amount">
-                    ${formatCurrency(amount)}
-                </div>
-            `;
+        const row =
+            document.createElement("div");
 
 
-            categoryList.appendChild(row);
+        row.className = "category-row";
 
-        });
+
+        row.innerHTML = `
+            <div class="category-name">
+                ${escapeHtml(category)}
+            </div>
+
+            <div class="category-bar">
+
+                <div
+                    class="category-bar-fill"
+                    style="
+                        width: ${percentage}%;
+                        background: ${chartColors[index % chartColors.length]};
+                    "
+                ></div>
+
+            </div>
+
+            <div class="category-amount">
+                ${formatCurrency(amount)}
+            </div>
+        `;
+
+
+        categoryList.appendChild(row);
+
+    });
 
 }
-
 
 // --------------------------------------------------
 // Recent Expenses
@@ -268,7 +337,7 @@ function renderRecentExpenses(expenses) {
     recentExpenses.innerHTML = "";
 
 
-    if (expenses.length === 0) {
+    if (!Array.isArray(expenses) || expenses.length === 0) {
 
         recentExpenses.innerHTML = `
             <div class="empty-state">
@@ -282,17 +351,18 @@ function renderRecentExpenses(expenses) {
 
 
     const recent = [...expenses]
-        .sort((a, b) => {
-
-            return new Date(b.date) - new Date(a.date);
-
-        })
+        .sort(
+            (a, b) =>
+                new Date(b.date) - new Date(a.date)
+        )
         .slice(0, 5);
 
 
     recent.forEach(expense => {
 
-        const item = document.createElement("div");
+        const item =
+            document.createElement("div");
+
 
         item.className = "recent-item";
 
@@ -301,10 +371,13 @@ function renderRecentExpenses(expenses) {
             <div class="expense-info">
 
                 <div class="expense-avatar">
-                    ${escapeHtml(getInitial(expense.title))}
+                    ${escapeHtml(
+                        getInitial(expense.title)
+                    )}
                 </div>
 
                 <div>
+
                     <div class="expense-title">
                         ${escapeHtml(expense.title)}
                     </div>
@@ -314,6 +387,7 @@ function renderRecentExpenses(expenses) {
                         ·
                         ${formatDate(expense.date)}
                     </div>
+
                 </div>
 
             </div>
@@ -329,8 +403,6 @@ function renderRecentExpenses(expenses) {
     });
 
 }
-
-
 // --------------------------------------------------
 // Expense Table
 // --------------------------------------------------
@@ -743,6 +815,49 @@ document.getElementById("viewAllBtn")
     );
 
 
+expenseSearch.addEventListener(
+    "input",
+    () => {
+
+        const query =
+            expenseSearch.value
+                .trim()
+                .toLowerCase();
+
+
+        const category =
+            categoryFilter.value;
+
+
+        const filtered =
+            allExpenses.filter(expense => {
+
+                const matchesSearch =
+                    expense.title
+                        .toLowerCase()
+                        .includes(query) ||
+                    expense.category
+                        .toLowerCase()
+                        .includes(query);
+
+
+                const matchesCategory =
+                    !category ||
+                    expense.category === category;
+
+
+                return matchesSearch &&
+                       matchesCategory;
+
+            });
+
+
+        renderExpensesTable(filtered);
+
+    }
+);
+
+
 // --------------------------------------------------
 // Initial Load
 // --------------------------------------------------
@@ -751,3 +866,4 @@ document.addEventListener(
     "DOMContentLoaded",
     loadDashboard
 );
+
